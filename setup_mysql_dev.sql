@@ -1,46 +1,12 @@
-#!/usr/bin/python3
-"""
-Script to prepare MySQL server for the project.
-
-Tasks:
-	- Create a database hbnb_test_db
-- Create a new user hbnb_test (in localhost)
-	- Set the password of hbnb_test to hbnb_test_pwd
-	- Grant all privileges to hbnb_test on the database hbnb_test_db (and only this database)
-- Grant SELECT privilege to hbnb_test on the database performance_schema (and only this database)
-	"""
-
-	import MySQLdb
-
-# Database and user information
-	DB_NAME = 'hbnb_test_db'
-	DB_USER = 'hbnb_test'
-	DB_PASSWORD = 'hbnb_test_pwd'
-
-
-	try:
-	db = MySQLdb.connect(host="localhost", user="root", passwd="")
-cursor = db.cursor()
-
-
-	cursor.execute("CREATE DATABASE IF NOT EXISTS {}".format(DB_NAME))
-
-
-	cursor.execute("CREATE USER IF NOT EXISTS '{}'@'localhost' IDENTIFIED BY '{}'".format(DB_USER, DB_PASSWORD))
-
-
-	cursor.execute("GRANT ALL PRIVILEGES ON {}.* TO '{}'@'localhost'".format(DB_NAME, DB_USER))
-
-
-	cursor.execute("GRANT SELECT ON performance_schema.* TO '{}'@'localhost'".format(DB_USER))
-
-
-	cursor.execute("FLUSH PRIVILEGES")
-
-	cursor.close()
-db.close()
-
-	print("MySQL server prepared successfully!")
-
-	except MySQLdb.Error as e:
-	print("Error: {}".format(e))
+-- Script to prepare MySQL server for the project
+-- Create project development database with the name: hbnb_dev_db
+CREATE DATABASE IF NOT EXISTS hbnb_dev_db;
+-- Create a new user named: hbnb_dev with all privileges on the db hbnb_dev_db
+-- Set the password: hbnb_dev_pwd if it doesn't exist
+CREATE USER IF NOT EXISTS 'hbnb_dev'@'localhost' IDENTIFIED BY 'hbnb_dev_pwd';
+-- Grant all privileges to the new user on hbnb_dev_db
+GRANT ALL PRIVILEGES ON hbnb_dev_db.* TO 'hbnb_dev'@'localhost';
+FLUSH PRIVILEGES;
+-- Grant the SELECT privilege for the user hbnb_dev in the db performance_schema
+GRANT SELECT ON performance_schema.* TO 'hbnb_dev'@'localhost';
+FLUSH PRIVILEGES;
