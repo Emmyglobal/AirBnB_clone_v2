@@ -116,25 +116,36 @@ class HBNBCommand(cmd.Cmd):
     def do_create(self, args):
         """ Create an object of any class"""
         try:
-            if not args:
-                raise SyntaxError()
-            arg_list = args.split(" ")
-            kw = {}
-            for arg in arg_list[1:]:
-                arg_splited = arg.split("=")
-                arg_splited[1] = eval(arg_splited[1])
-                if type(arg_splited[1]) is str:
-                    arg_splited[1] = arg_splited[1].replace("_", " ").replace('"', '\\"')
-                kw[arg_splited[0]] = arg_splited[1]
-        except SyntaxError:
+            class_name = args.split(" ")[0]
+        except IndexError:
+            pass
+        if not class_name:
             print("** class name missing **")
-        except NameError:
+            return
+        elif class_name not in HBNBCommand.classes:
             print("** class doesn't exist **")
-        new_instance = HBNBCommand.classes[arg_list[0]](**kw)
-        new_instance.save()
-        storage.save()
+
+            # create Place city_id="0001" user_id="001" name="My_little_house"
+        all_list = args.split(" ")
+
+        new_instance = eval(class_name)()
+
+        for i in range(1, len(all_list)):
+            key, value = tuple(all_list[i].split("="))
+            if value.startswith('"'):
+                value.strip('"').replace("_", " ")
+            else:
+                try:
+                    value = eval(value)
+                except Exception:
+                    print(f"** couldn't evaluate {value}")
+                    pass
+            if hasattr(new_instance, key):
+                setatrr(new_instance, key, value)
+
+        storage.new(new_instance)
         print(new_instance.id)
-        storage.save()
+        new_instance.save()
 
     def help_create(self):
         """ Help information for the create method """
