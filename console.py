@@ -115,22 +115,20 @@ class HBNBCommand(cmd.Cmd):
         """ Overrides the emptyline method of CMD """
         pass
 
-    def do_create(self, args):
-        """
-        Create an object of any class
-        Creates a new instance of BaseModel, saves it
-            ## Exceptions:
-            SyntaxtError: when there is no args given
-            Name Error: when there is no object that has the name
+    def do_create(self, line):
+        """ Creates a new instance of BaseModel, saves it
+        ### Exceptions:
+            SyntaxError: when there is no args given
+            NameError: when there is no object taht has the name
         """
         try:
-            if not args:
+            if not line:
                 raise SyntaxError()
-            my_list = args.split(" ") # split cmd arguments into list
+            my_list = line.split(" ")  # split cmd line into list
 
-            if my_list: # if list not empty
-                cls_name = my_list[0] # extract class name
-            else: # class name missing
+            if my_list:  # if list not empty
+                cls_name = my_list[0]  # extract class name
+            else:  # class name missing
                 raise SyntaxError()
 
             kwargs = {}
@@ -144,15 +142,17 @@ class HBNBCommand(cmd.Cmd):
                 else:
                     v = v.replace('_', ' ')
                     kwargs[k] = v.strip('"\'')
-            obj = self.all_classes[cls_name](**kwargs)
-            storage.new(obj) #store new object
-            obj.save() # save storage to file
-            print(obj.id) # print id of created object class
 
-        except SytaxError:
+            obj = self.all_classes[cls_name](**kwargs)
+            storage.new(obj)  # store new object
+            obj.save()  # save storage to file
+            print(obj.id)  # print id of created object class
+
+        except SyntaxError:
             print("** class name missing **")
         except KeyError:
             print("** class doesn't exist **")
+
 
     def help_create(self):
         """ Help information for the create method """
