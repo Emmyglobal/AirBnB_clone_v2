@@ -1,6 +1,8 @@
 #!/usr/bin/python3
 """ Console Module """
 import cmd
+from datetime import datetime
+from shlex import split
 import sys
 from models.base_model import BaseModel
 from models.__init__ import storage
@@ -114,38 +116,43 @@ class HBNBCommand(cmd.Cmd):
         pass
 
     def do_create(self, args):
-        """ Create an object of any class"""
+        """
+        Create an object of any class
+        Creates a new instance of BaseModel, saves it
+            ## Exceptions:
+            SyntaxtError: when there is no args given
+            Name Error: when there is no object that has the name
+        """
         try:
-            class_name = args.split(" ")[0]
-        except IndexError:
-            pass
-        if not class_name:
+            if not args:
+                raise SyntaxError()
+            my_list = args.split(" ") # split cmd arguments into list
+
+            if my_list: # if list not empty
+                cls_name = my_list[0] # extract class name
+            else: # class name missing
+                raise SyntaxError()
+
+            kwargs = {}
+
+            for pair in my_list[1:]:
+                k, v = pair.split("=")
+                if self.is_int(v):
+                    kwargs[k] = int(v)
+                elif self.is_float(v):
+                    kwargs[k] = float(v)
+                else:
+                    v = v.replace('_', ' ')
+                    kwargs[k] = v.strip('"\'')
+            obj = self.all_classes[cls_name](**kwargs)
+            storage.new(obj) #store new object
+            obj.save() # save storage to file
+            print(obj.id) # print id of created object class
+
+        except SytaxError:
             print("** class name missing **")
-            return
-        elif class_name not in HBNBCommand.classes:
+        except KeyError:
             print("** class doesn't exist **")
-
-            # create Place city_id="0001" user_id="001" name="My_little_house"
-        all_list = args.split(" ")
-
-        new_instance = eval(class_name)()
-
-        for i in range(1, len(all_list)):
-            key, value = tuple(all_list[i].split("="))
-            if value.startswith('"'):
-                value.strip('"').replace("_", " ")
-            else:
-                try:
-                    value = eval(value)
-                except Exception:
-                    print(f"** couldn't evaluate {value}")
-                    pass
-            if hasattr(new_instance, key):
-                setatrr(new_instance, key, value)
-
-        storage.new(new_instance)
-        print(new_instance.id)
-        new_instance.save()
 
     def help_create(self):
         """ Help information for the create method """
