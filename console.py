@@ -153,7 +153,7 @@ class HBNBCommand(cmd.Cmd):
                         pass
                 setattr(obj, key, value)
             obj.save()
-            print("{}".format(obj.id))
+            print("{}".format(obj.
 
     def help_create(self):
         """ Help information for the create method """
