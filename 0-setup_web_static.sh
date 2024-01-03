@@ -1,21 +1,33 @@
 #!/usr/bin/env bash
-
-# Install Nginx if not already installed
+# A Script that sets up your web servers for the deployment of web_static
+# Installing Nginx
 sudo apt-get -y update
 sudo apt-get -y install nginx
 
-# Create necessary folders
-sudo mkdir -p /data/web_static/releases/test /data/web_static/shared
+# Create the folders
+sudo mkdir -p /data/
+sudo mkdir -p /data/web_static/
+sudo mkdir -p /data/web_static/releases/
+sudo mkdir -p /data/web_static/shared/
+sudo mkdir -p /data/web_static/releases/test/
+sudo touch /data/web_static/releases/test/index.html
 
-# Create a fake HTML file
-echo "<html><head></head><body> Test Nginx Configuration</body></html>" | sudo tee /data/web_static/releases/test/index.html > /dev/null
+sudo echo "<html>
+  <head>
+  </head>
+  <body>
+    Holberton School
+  </body>
+</html>" | sudo tee '/data/web_static/releases/test/index.html'
 
-# Create symbolic link
-sudo ln -sf /data/web_static/releases/test/ /data/web_static/current
+# Create a symbolic link
+sudo ln -s -f /data/web_static/releases/test/ /data/web_static/current
 
-# Update Nginx configuration
-config_file="/etc/nginx/sites-available/default"
-sudo sed -i '/location \/ {/a\\tlocation /hbnb_static/ {\n\t\talias /data/web_static/current/;\n\t}\n' $config_file
+# Ownership of the folder
+sudo chown -R ubuntu:ubuntu /data/
 
-# Restart Nginx
+# Nginx Config to serve content
+sudo sed -i '/listen 80 default_server/a location /hbnb_static { alias /data/web_static/current/;}' /etc/nginx/sites-enabled/default
+
+# restart Nginx
 sudo service nginx restart
